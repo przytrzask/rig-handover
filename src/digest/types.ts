@@ -15,15 +15,21 @@ export type RunLogLine = {
 /** One row per job for the night. */
 export type DigestRow = {
   job: string;
-  /** `null` stays `null` here; views render it as `—`. */
+  /** Owner on the job's last line (by `at`). `null` stays `null` here; views render it as `—`. */
   owner: string | null;
   /** Lines seen for this job. */
   runs: number;
   /** Lines with status `retry`. */
   retries: number;
-  /** Status of the job's last line (by `at`). */
+  /**
+   * Status of the job's last line, ordered by `at` as an instant (offsets compared, not strings);
+   * lines with the same instant keep file order.
+   */
   lastStatus: RunStatus;
-  /** `error` of the job's last line that carried one, if any. */
+  /**
+   * `error` of the job's last line that carried one, if any, even when a later line recovered
+   * (so a retried-then-ok job still says why it retried). Absent when no line had an error.
+   */
   lastError?: string;
   /** `at` of the job's first and last line, offset kept. */
   firstAt: string;
@@ -34,7 +40,9 @@ export type DigestRow = {
  * The result of reading one night.
  * - `missing`: no runs/<night>.jsonl on disk (routes answer 404).
  * - `found`: the file exists; `rows` may be empty ("nothing ran").
- *   `badLines` counts lines that did not parse; they are never thrown.
+ *   `badLines` counts non-blank lines that are not valid JSON or lack a valid `at`, `job`,
+ *   `status` or `owner`; they are never thrown. Blank lines are skipped, not counted.
+ * A `night` that is not `YYYY-MM-DD` reads as `missing`.
  */
 export type Night =
   | { kind: 'missing'; night: string }
