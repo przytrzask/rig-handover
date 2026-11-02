@@ -15,7 +15,14 @@ in a shell this agent can run.
    One issue per unit of work.
 3. **Stop and show the table to the human.** Publish nothing until they approve it.
 4. Ask the human what every issue here must carry (fields, labels, wording), unless it is
-   already written down in this session or in the repo.
+   already written down in this session or in the repo. What every issue here carries:
+   - First line: `Source: plan.md § <n>` (the plan section it comes from; `§ 2a` for a sub-part).
+   - The label `plan:<plan>` from the plan's frontmatter (e.g. `plan:morning-digest`). Create it
+     once: `gh label create "plan:<plan>"`.
+   - Sections: Scope · Done when (copied from the plan) · Blocked by (issue numbers) · Worker
+     (strongest model for logic, cheaper for views and tests).
+   - A step that waits on someone else (a reviewer, a host, a person) says so in "Blocked by" and
+     "Done when". It stays open until that happens, and the clean-up after it is blocked by it.
 5. Create each issue in dependency order, so blocked-by can cite real numbers:
 
    ```sh
@@ -29,6 +36,10 @@ Closing one, with the closing comment from AGENTS.md:
 ```sh
 gh issue close <n> -c "<closing comment>"
 ```
+
+Close only when its "Done when" holds on the default branch. A commit with `closes #n` pushed to
+the default branch closes the issue without the closing comment: post the comment first, or keep
+`closes #n` out of the message and close by hand.
 
 ## No `gh`
 
