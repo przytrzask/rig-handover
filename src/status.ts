@@ -8,7 +8,7 @@ export type Status = {
   installed: string;
   lastBeat: Beat | null;
   nights: string[];
-  /** Per night: jobs by last status (from readNight rows); null if unreadable. */
+  /** Per night: jobs by their last status (from readNight rows), not log lines; null if unreadable. */
   counts: Record<string, { ok: number; retry: number; fail: number } | null>;
 };
 
